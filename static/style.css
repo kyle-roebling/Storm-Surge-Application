@@ -5,6 +5,19 @@
 
 html, body {
    height: 100%;
+   width: 100%;
 }
 
-#mapid { height: 90%;}
+#mapid { height: 90%;
+         width: 75%;
+         float:left
+  }
+
+#dashboard { float:right;
+            width: 25%;
+            height: 90%;
+}
+
+#population_card { height:30%;
+
+}
