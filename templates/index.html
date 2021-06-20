@@ -2,19 +2,17 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title>Storm Surge Application</title>
-
+   <title>Storm Surge Application</title>
 
       <!--Load Boostrap 4 js and css -->
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
 
       <!--Load leaflet js and css -->
       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="crossorigin=""/>
-      <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="crossorigin=""></script>
+
 
       <!--Load Custom CSS Style -->
       <link href="{{url_for('static', filename = 'style.css')}}" rel="stylesheet">
@@ -89,36 +87,50 @@
         </form>
       </div>
     </nav>
-    <!-- Add Leaflet Map -->
-    <div id="mapid"> </div>
+    <!-- Add Boostrap Grid -->
+        <div class="container-main">
+        <!-- Add Leaflet Map -->
 
-    <!-- Add div to hold cards for dashboard -->
-    <div id="dashboard">
+          <div class="row">
+            <div class="col-md-8">
+              <div class="container-map">
+                <div id="mapid"> </div>
+              </div>
+           </div>
 
-      <div class="card card bg-light text-dark h-45 d-inline-block w-100 p-3">
-        <div class="card-body text-center bg-light border border-dark" id="population_card">
-          <h4> Population Impacted</h4>
-          <h4 class="text-danger"> 5,630 </h4>
-        </div>
+        <!-- Add div to hold cards for dashboard -->
+          <div class="col-md-4" id="dashboard">
+            <div class="container-side d-inline-block w-100">
+              <div class="card card bg-light text-dark h-45 d-inline-block w-100 p-3">
+                <div class="card-body text-center bg-light border border-dark" id="population_card">
+                  <h4> Population Impacted</h4>
+                  <h4 class="text-danger"> 5,630 </h4>
+                </div>
+              </div>
+              <div class="card bg-light text-dark h-45 d-inline-block w-100 p-3" id="building_card">
+                <div class="card-body text-center border border-dark">
+                  <h4>Buildings Impacted</h4>
+                  <h4 class="text-danger"> 1,300 </h4>
+                </div>
+              </div>
+              <div class="card bg-light text-dark h-45 d-inline-block w-100 p-3" id="road_card">
+                <div class="card-body text-center border border-dark">
+                  <h4>Roads Impacted </h4>
+                  <h4 class="text-danger"> 55 miles</h4>
+                </div>
+              </div>
+            </div>
+          </div>
       </div>
-      <div class="card bg-light text-dark h-45 d-inline-block w-100 p-3" id="building_card">
-        <div class="card-body text-center border border-dark">
-          <h4>Buildings Impacted</h4>
-          <h4 class="text-danger"> 1,300 </h4>
-        </div>
-      </div>
-      <div class="card bg-light text-dark h-45 d-inline-block w-100 p-3" id="road_card">
-        <div class="card-body text-center border border-dark">
-          <h4>Roads Impacted </h4>
-          <h4 class="text-danger"> 55 miles</h4>
-        </div>
-      </div>
-
-
     </div>
 
 
   <!-- Add main.js -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="crossorigin=""></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script src="../static/main.js"></script>
   </body>
 </html>

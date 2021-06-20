@@ -4,6 +4,7 @@
 
 //Create leaflet map variable
 var mymap = L.map('mapid').setView([30.695366, -88.039894], 9);
+mymap.invalidateSize();
 
 //Add Basemap
 L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
