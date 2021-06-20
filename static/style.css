@@ -1,23 +1,44 @@
-/* Change nav bar text color */
-.navbar-text {
-    color: #f8f9fa;
-}
 
-html, body {
+/*html, body {
    height: 100%;
    width: 100%;
 }
+*/
 
-#mapid { height: 90%;
-         width: 75%;
-         float:left
+/*
+.map-container {
+    max-width: 500px;
+    margin: auto;
+    margin-bottom: 15px;
+}
+
+.side-container{
+  margin: auto;
+  margin-bottom: 15px;
+}
+*/
+#mapid { position: relative;
+         height: 90vh;
+         /*width: 800px;*/
+         /*float:left;
+         position: relative;*/
   }
 
-#dashboard { float:right;
-            width: 25%;
-            height: 90%;
+#dashboard { /*float:right;*/
+            /*width: 800px;*/
+            height: 90vh;
 }
 
 #population_card { height:30%;
 
+}
+
+.col-md-4 {
+   padding-right: 0px;
+   padding-left: 0px;
+}
+
+.col-md-8 {
+   padding-right: 0px;
+   padding-left: 0px;
 }
