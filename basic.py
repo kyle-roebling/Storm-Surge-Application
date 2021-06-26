@@ -3,10 +3,13 @@ from flask import Flask, render_template
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Numeric
+from sqlalchemy import func
 from geoalchemy2 import Geometry
+from geoalchemy2 import functions
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import select
 import psycopg2
+from geojson_rewind import rewind
 
 #Create flask python app
 app = Flask(__name__)
@@ -29,28 +32,33 @@ class city_limits(Base):
     sqmi = Column(Numeric)
     shape_leng = Column(Numeric)
     shape_area = Column(Numeric)
-    geom = Column(Geometry('POLYGON'))
+    geom = Column(Geometry('POLYGON', 4326))
 
 #Create DB sessionmaker
 Session = sessionmaker(bind=engine)
 session = Session()
 
-#Create connection
-conn = engine.connect()
+#Ceate query of database
+qry = session.query(city_limits,functions.ST_AsGeoJSON(city_limits.geom))
+#qry = session.query(city_limits1,functions.ST_AsGeoJSON(func.ST_SetSRID(city_limits1.geom,4326)))
 
-#Ceate select object
-s = select([city_limits])
-print(s)
+print(qry[0][0].name)
+print(qry[1][1])
+#Create geojson file
+f = open(r"city_limits.geojson", 'w')
 
-result = conn.execute(s)
-for row in result:
-    print(row['name'])
+#Enforce right hand rule
+corrected = rewind(qry[0][1])
 
-#Create Query for database
-#query = session.query(city_limits).all()
-#print(query)
-#for city in query:
-    #print(city.name)
+f.write(f'{{"type": "Feature","geometry":{corrected},"properties": {{"name": "{qry[0][0].name}"}}}},')
+
+#for row in qry:
+    #print(f'{{"type": "Feature","geometry":{row[1]},"properties": {{"name": {row[0].name}}}}}')
+    #f.write(f'{{"type": "Feature","geometry":{row[1]},"properties": {{"name": {row[0].name}}}}},')
+
+
+#Close file
+f.close()
 
 #Main web page
 @app.route('/')
