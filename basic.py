@@ -42,20 +42,29 @@ session = Session()
 qry = session.query(city_limits,functions.ST_AsGeoJSON(city_limits.geom))
 #qry = session.query(city_limits1,functions.ST_AsGeoJSON(func.ST_SetSRID(city_limits1.geom,4326)))
 
-print(qry[0][0].name)
-print(qry[1][1])
+
 #Create geojson file
-f = open(r"city_limits.geojson", 'w')
+f = open(r"static/city_limits.geojson", 'w')
 
-#Enforce right hand rule
-corrected = rewind(qry[0][1])
+#Write first line
+f.write(f'{{"type":"FeatureCollection","features":[')
 
-f.write(f'{{"type": "Feature","geometry":{corrected},"properties": {{"name": "{qry[0][0].name}"}}}},')
-
-#for row in qry:
+for row in qry:
     #print(f'{{"type": "Feature","geometry":{row[1]},"properties": {{"name": {row[0].name}}}}}')
-    #f.write(f'{{"type": "Feature","geometry":{row[1]},"properties": {{"name": {row[0].name}}}}},')
+    
+    #Enforce right hand rule
+    corrected = rewind(row[1])
 
+    #Check to see if the row is the last element if so remove ending comma for geojson file
+    if row != qry[-1]:
+        #Write out rows to create geojson file with comma
+        f.write(f'{{"type": "Feature","geometry":{corrected},"properties": {{"name": "{row[0].name}"}}}},')
+    else:
+        #Write out list feature without ending comma
+        f.write(f'{{"type": "Feature","geometry":{corrected},"properties": {{"name": "{row[0].name}"}}}}')
+
+#Write last line
+f.write(f']}}')
 
 #Close file
 f.close()
