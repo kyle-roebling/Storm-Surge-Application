@@ -42,7 +42,6 @@ session = Session()
 qry = session.query(city_limits,functions.ST_AsGeoJSON(city_limits.geom))
 #qry = session.query(city_limits1,functions.ST_AsGeoJSON(func.ST_SetSRID(city_limits1.geom,4326)))
 
-
 #Create geojson file
 f = open(r"static/city_limits.geojson", 'w')
 
@@ -51,7 +50,7 @@ f.write(f'{{"type":"FeatureCollection","features":[')
 
 for row in qry:
     #print(f'{{"type": "Feature","geometry":{row[1]},"properties": {{"name": {row[0].name}}}}}')
-    
+
     #Enforce right hand rule
     corrected = rewind(row[1])
 
