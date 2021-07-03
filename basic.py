@@ -1,5 +1,5 @@
 #Import python libaries
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Numeric
@@ -72,6 +72,15 @@ f.close()
 @app.route('/')
 def index():
 
+    return render_template("index.html")
+
+#Page after user has submitted city and Category
+@app.route('/submit', methods=['POST'])
+def submit():
+    if request.method == 'POST':
+        city_name = request.form['city']
+        category = request.form['category']
+        print(city_name,category)
 
     return render_template("index.html")
 
