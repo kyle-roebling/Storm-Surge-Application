@@ -33,11 +33,11 @@
       </button>
       <!-- Everything inside here collaspes -->
       <div class="collapse navbar-collapse" id="collapsibleNavbar">
-        <form class="form-inline navbar-nav ml-auto" action="#">
+        <form class="form-inline navbar-nav ml-auto" action="/submit" method="POST">
 
           <!-- Dropdown input boxes -->
           <span class="navbar-text text-white">City/Town: </span>
-          <select class="custom-select custom-select-sm my-2 mx-4" id="city">
+          <select class="custom-select custom-select-sm my-2 mx-4" name="city">
             <option value="Axis">Axis</option>
             <option value="Bay Minette">Bay Minette</option>
             <option value="Bayou La Batre">Bayou La Batre</option>
@@ -76,7 +76,7 @@
           </select>
 
           <span class="navbar-text text-white">Category: </span>
-          <select class="custom-select custom-select-sm my-2 mx-4" id="catogory">
+          <select class="custom-select custom-select-sm my-2 mx-4" name="category">
             <option value="1">Category 1</option>
             <option value="2">Category 2</option>
             <option value="3">Category 3</option>
