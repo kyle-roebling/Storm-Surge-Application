@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+   <title>Storm Surge Application</title>
+
+      <!--Load Boostrap 4 js and css -->
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+
+
+      <!--Load leaflet js and css -->
+      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="crossorigin=""/>
+
+
+      <!--Load Custom CSS Style -->
+      <link href="{{url_for('static', filename = 'style.css')}}" rel="stylesheet">
+
+  </head>
+
+  <body>
+    <!-- Create Boostrap 4 Collapsible Nav Bar -->
+    <nav class="navbar navbar-expand-md bg-primary navbar-dark">
+      <a class="navbar-brand" href="#">
+        <img src="../static/red-hurricane.png" alt="Logo" style="width:30px;color:red;">
+      </a>
+      <span class="navbar-text text-white">
+          <h5>Coastal Alabama Storm Surge Impact</h5>
+      </span>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <!-- Everything inside here collaspes -->
+      <div class="collapse navbar-collapse" id="collapsibleNavbar">
+        <form class="form-inline navbar-nav ml-auto" action="/submit" method="POST">
+
+          <!-- Dropdown input boxes -->
+          <span class="navbar-text text-white">City/Town: </span>
+          <select class="custom-select custom-select-sm my-2 mx-4" name="city">
+            <option value="Axis">Axis</option>
+            <option value="Bay Minette">Bay Minette</option>
+            <option value="Bayou La Batre">Bayou La Batre</option>
+            <option value="Belle Fontaine">Belle Fontaine</option>
+            <option value="Bucks">Bucks</option>
+            <option value="Calvert">Calvert</option>
+            <option value="Chickasaw">Chickasaw</option>
+            <option value="Chunchula">Chunchula</option>
+            <option value="Citronelle">Citronelle</option>
+            <option value="Creola">Creola</option>
+            <option value="Daphne">Daphne</option>
+            <option value="Dauphin Island">Dauphin Island</option>
+            <option value="Elberta">Elberta</option>
+            <option value="Fairhope">Fairhope</option>
+            <option value="Foley">Foley</option>
+            <option value="Grand Bay">Grand Bay</option>
+            <option value="Gulf Shores">Gulf Shores</option>
+            <option value="Gulfcrest">Gulfcrest</option>
+            <option value="Loxley">Loxley</option>
+            <option value="Magnolia Springs">Magnolia Springs</option>
+            <option value="Mobile">Mobile</option>
+            <option value="Mount Vernon">Mount Vernon</option>
+            <option value="Movico">Movico</option>
+            <option value="Orange Beach">Orange Beach</option>
+            <option value="Perdido Beach">Perdido Beach</option>
+            <option value="Point Clear">Point Clear</option>
+            <option value="Prichard">Prichard</option>
+            <option value="Robertsdale">Robertsdale</option>
+            <option value="Saraland">Saraland</option>
+            <option value="Satsuma">Satsuma</option>
+            <option value="Silverhill">Silverhill</option>
+            <option value="Spanish Fort">Spanish Fort</option>
+            <option value="Summerdale">Summerdale</option>
+            <option value="Theodore">Theodore</option>
+            <option value="Tillmans Corner">Tillmans Corner</option>
+          </select>
+
+          <span class="navbar-text text-white">Category: </span>
+          <select class="custom-select custom-select-sm my-2 mx-4" name="category">
+            <option value="1">Category 1</option>
+            <option value="2">Category 2</option>
+            <option value="3">Category 3</option>
+            <option value="4">Category 4</option>
+            <option value="5">Category 5</option>
+          </select>
+          <button type="submit" class="btn btn-light btn-sm">Analysis</button>
+        </form>
+      </div>
+    </nav>
+    <!-- Add Boostrap Grid -->
+        <div class="container-main">
+        <!-- Add Leaflet Map -->
+
+          <div class="row">
+            <div class="col-md-8">
+              <div class="container-map">
+                <div id="mapid"> </div>
+              </div>
+           </div>
+
+        <!-- Add div to hold cards for dashboard -->
+          <div class="col-md-4" id="dashboard">
+            <div class="container-side d-inline-block w-100">
+              <div class="card card bg-light text-dark h-45 d-inline-block w-100 p-3">
+                <div class="card-body text-center bg-light border border-dark" id="population_card">
+                  <h4> Population Impacted</h4>
+                  <h4 class="text-danger"> 5,630 </h4>
+                </div>
+              </div>
+              <div class="card bg-light text-dark h-45 d-inline-block w-100 p-3" id="building_card">
+                <div class="card-body text-center border border-dark">
+                  <h4>Buildings Impacted</h4>
+                  <h4 class="text-danger"> 1,300 </h4>
+                </div>
+              </div>
+              <div class="card bg-light text-dark h-45 d-inline-block w-100 p-3" id="road_card">
+                <div class="card-body text-center border border-dark">
+                  <h4>Roads Impacted </h4>
+                  <h4 class="text-danger"> 55 miles</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+
+
+  <!-- Add main.js -->
+  <!-- Include jQuery.js -->
+  <scriptsrc="https://code.jquery.com/jquery-3.6.0.min.js"integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="crossorigin=""></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="../static/submit.js"></script>
+  </body>
+</html>
