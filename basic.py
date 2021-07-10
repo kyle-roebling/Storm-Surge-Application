@@ -133,15 +133,11 @@ def buildCategory(session,category):
 
     #Create geojson file
     f = open(r"static/category.geojson", 'w')
-
     #Write first line
     f.write(f'{{"type":"FeatureCollection","features":[')
-
     for row in qry:
-
         #Enforce right hand rule
         corrected = rewind(row[1])
-
         #Check to see if the row is the last element if so remove ending comma for geojson file
         if row != qry[-1]:
             #Write out rows to create geojson file with comma
@@ -152,9 +148,38 @@ def buildCategory(session,category):
 
     #Write last line
     f.write(f']}}')
-
     #Close file
     f.close()
+
+def buildCity(session,city_name):
+    print(city_name)
+    #Ceate query of database to only get the city that was selected
+    qry = session.query(city_limits,functions.ST_AsGeoJSON(city_limits.geom)).filter_by(name=f'{city_name}')
+    #qry = session.query(city_limits,functions.ST_AsGeoJSON(city_limits.geom)).filter_by(name='Bayou La Batre')
+
+    #Create geojson file
+    f = open(r"static/city.geojson", 'w')
+    #Write first line
+    f.write(f'{{"type":"FeatureCollection","features":[')
+
+    for row in qry:
+        print(row[0].name)
+        #print(f'{{"type": "Feature","geometry":{row[1]},"properties": {{"name": {row[0].name}}}}}')
+        #Enforce right hand rule
+        corrected = rewind(row[1])
+        #Check to see if the row is the last element if so remove ending comma for geojson file
+        if row != qry[-1]:
+            #Write out rows to create geojson file with comma
+            f.write(f'{{"type": "Feature","geometry":{corrected},"properties": {{"name": "{row[0].name}"}}}},')
+        else:
+            #Write out list feature without ending comma
+            f.write(f'{{"type": "Feature","geometry":{corrected},"properties": {{"name": "{row[0].name}"}}}}')
+
+    #Write last line
+    f.write(f']}}')
+    #Close file
+    f.close()
+
 
 
 #Main web page
@@ -168,9 +193,12 @@ def index():
 @app.route('/submit', methods=['POST'])
 def submit():
     if request.method == 'POST':
+        #Save form data into variables
         city_name = request.form['city']
         category = request.form['category']
+        #Call function to query data for category and city
         buildCategory(session,category)
+        buildCity(session,city_name)
 
     return render_template("submit.html")
 
