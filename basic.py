@@ -34,43 +34,133 @@ class city_limits(Base):
     shape_area = Column(Numeric)
     geom = Column(Geometry('POLYGON', 4326))
 
+#Create class for Category table
+class category_1(Base):
+    __tablename__ = 'category_1'
+    gid = Column(Integer, primary_key=True)
+    objectid = Column(Numeric)
+    shape_leng = Column(Numeric)
+    shape_area = Column(Numeric)
+    geom = Column(Geometry('POLYGON', 4326))
+
+#Create class for Category table
+class category_2(Base):
+    __tablename__ = 'category_2'
+    gid = Column(Integer, primary_key=True)
+    objectid = Column(Numeric)
+    shape_leng = Column(Numeric)
+    shape_area = Column(Numeric)
+    geom = Column(Geometry('POLYGON', 4326))
+
+#Create class for Category table
+class category_3(Base):
+    __tablename__ = 'category_3'
+    gid = Column(Integer, primary_key=True)
+    objectid = Column(Numeric)
+    shape_leng = Column(Numeric)
+    shape_area = Column(Numeric)
+    geom = Column(Geometry('POLYGON', 4326))
+
+#Create class for Category table
+class category_4(Base):
+    __tablename__ = 'category_4'
+    gid = Column(Integer, primary_key=True)
+    objectid = Column(Numeric)
+    shape_leng = Column(Numeric)
+    shape_area = Column(Numeric)
+    geom = Column(Geometry('POLYGON', 4326))
+
+#Create class for Category table
+class category_5(Base):
+    __tablename__ = 'category_5'
+    gid = Column(Integer, primary_key=True)
+    objectid = Column(Numeric)
+    shape_leng = Column(Numeric)
+    shape_area = Column(Numeric)
+    geom = Column(Geometry('POLYGON', 4326))
+
+
 #Create DB sessionmaker
 Session = sessionmaker(bind=engine)
 session = Session()
 
-#Ceate query of database
-qry = session.query(city_limits,functions.ST_AsGeoJSON(city_limits.geom))
-#qry = session.query(city_limits1,functions.ST_AsGeoJSON(func.ST_SetSRID(city_limits1.geom,4326)))
 
-#Create geojson file
-f = open(r"static/city_limits.geojson", 'w')
+def build_cityLimits(session):
+    #Ceate query of database
+    qry = session.query(city_limits,functions.ST_AsGeoJSON(city_limits.geom))
+    #qry = session.query(city_limits1,functions.ST_AsGeoJSON(func.ST_SetSRID(city_limits1.geom,4326)))
 
-#Write first line
-f.write(f'{{"type":"FeatureCollection","features":[')
+    #Create geojson file
+    f = open(r"static/city_limits.geojson", 'w')
 
-for row in qry:
-    #print(f'{{"type": "Feature","geometry":{row[1]},"properties": {{"name": {row[0].name}}}}}')
+    #Write first line
+    f.write(f'{{"type":"FeatureCollection","features":[')
 
-    #Enforce right hand rule
-    corrected = rewind(row[1])
+    for row in qry:
+        #print(f'{{"type": "Feature","geometry":{row[1]},"properties": {{"name": {row[0].name}}}}}')
 
-    #Check to see if the row is the last element if so remove ending comma for geojson file
-    if row != qry[-1]:
-        #Write out rows to create geojson file with comma
-        f.write(f'{{"type": "Feature","geometry":{corrected},"properties": {{"name": "{row[0].name}"}}}},')
-    else:
-        #Write out list feature without ending comma
-        f.write(f'{{"type": "Feature","geometry":{corrected},"properties": {{"name": "{row[0].name}"}}}}')
+        #Enforce right hand rule
+        corrected = rewind(row[1])
 
-#Write last line
-f.write(f']}}')
+        #Check to see if the row is the last element if so remove ending comma for geojson file
+        if row != qry[-1]:
+            #Write out rows to create geojson file with comma
+            f.write(f'{{"type": "Feature","geometry":{corrected},"properties": {{"name": "{row[0].name}"}}}},')
+        else:
+            #Write out list feature without ending comma
+            f.write(f'{{"type": "Feature","geometry":{corrected},"properties": {{"name": "{row[0].name}"}}}}')
 
-#Close file
-f.close()
+    #Write last line
+    f.write(f']}}')
+
+    #Close file
+    f.close()
+
+def buildCategory(session,category):
+    #Ceate query of database
+    print(category)
+    if category == "category_1":
+        qry = session.query(category_1,functions.ST_AsGeoJSON(category_1.geom))
+    elif category == "category_2":
+        qry = session.query(category_2,functions.ST_AsGeoJSON(category_2.geom))
+    elif category == "category_3":
+        qry = session.query(category_3,functions.ST_AsGeoJSON(category_3.geom))
+    elif category == "category_4":
+        qry = session.query(category_4,functions.ST_AsGeoJSON(category_4.geom))
+    elif category == "category_5":
+        qry = session.query(category_5,functions.ST_AsGeoJSON(category_5.geom))
+
+
+    #Create geojson file
+    f = open(r"static/category.geojson", 'w')
+
+    #Write first line
+    f.write(f'{{"type":"FeatureCollection","features":[')
+
+    for row in qry:
+
+        #Enforce right hand rule
+        corrected = rewind(row[1])
+
+        #Check to see if the row is the last element if so remove ending comma for geojson file
+        if row != qry[-1]:
+            #Write out rows to create geojson file with comma
+            f.write(f'{{"type": "Feature","geometry":{corrected}}},')
+        else:
+            #Write out list feature without ending comma
+            f.write(f'{{"type": "Feature","geometry":{corrected}}}')
+
+    #Write last line
+    f.write(f']}}')
+
+    #Close file
+    f.close()
+
 
 #Main web page
 @app.route('/')
 def index():
+    build_cityLimits(session)
 
     return render_template("index.html")
 
@@ -80,9 +170,9 @@ def submit():
     if request.method == 'POST':
         city_name = request.form['city']
         category = request.form['category']
-        print(city_name,category)
+        buildCategory(session,category)
 
-    return render_template("index.html")
+    return render_template("submit.html")
 
 
 if __name__ == '__main__':
