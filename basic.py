@@ -43,6 +43,42 @@ class category_1(Base):
     shape_area = Column(Numeric)
     geom = Column(Geometry('POLYGON', 4326))
 
+#Create class for Category table
+class category_2(Base):
+    __tablename__ = 'category_2'
+    gid = Column(Integer, primary_key=True)
+    objectid = Column(Numeric)
+    shape_leng = Column(Numeric)
+    shape_area = Column(Numeric)
+    geom = Column(Geometry('POLYGON', 4326))
+
+#Create class for Category table
+class category_3(Base):
+    __tablename__ = 'category_3'
+    gid = Column(Integer, primary_key=True)
+    objectid = Column(Numeric)
+    shape_leng = Column(Numeric)
+    shape_area = Column(Numeric)
+    geom = Column(Geometry('POLYGON', 4326))
+
+#Create class for Category table
+class category_4(Base):
+    __tablename__ = 'category_4'
+    gid = Column(Integer, primary_key=True)
+    objectid = Column(Numeric)
+    shape_leng = Column(Numeric)
+    shape_area = Column(Numeric)
+    geom = Column(Geometry('POLYGON', 4326))
+
+#Create class for Category table
+class category_5(Base):
+    __tablename__ = 'category_5'
+    gid = Column(Integer, primary_key=True)
+    objectid = Column(Numeric)
+    shape_leng = Column(Numeric)
+    shape_area = Column(Numeric)
+    geom = Column(Geometry('POLYGON', 4326))
+
 
 #Create DB sessionmaker
 Session = sessionmaker(bind=engine)
@@ -80,9 +116,20 @@ def build_cityLimits(session):
     #Close file
     f.close()
 
-def buildCategory(session):
+def buildCategory(session,category):
     #Ceate query of database
-    qry = session.query(category_1,functions.ST_AsGeoJSON(category_1.geom))
+    print(category)
+    if category == "category_1":
+        qry = session.query(category_1,functions.ST_AsGeoJSON(category_1.geom))
+    elif category == "category_2":
+        qry = session.query(category_2,functions.ST_AsGeoJSON(category_2.geom))
+    elif category == "category_3":
+        qry = session.query(category_3,functions.ST_AsGeoJSON(category_3.geom))
+    elif category == "category_4":
+        qry = session.query(category_4,functions.ST_AsGeoJSON(category_4.geom))
+    elif category == "category_5":
+        qry = session.query(category_5,functions.ST_AsGeoJSON(category_5.geom))
+
 
     #Create geojson file
     f = open(r"static/category.geojson", 'w')
@@ -106,6 +153,9 @@ def buildCategory(session):
     #Write last line
     f.write(f']}}')
 
+    #Close file
+    f.close()
+
 
 #Main web page
 @app.route('/')
@@ -120,7 +170,7 @@ def submit():
     if request.method == 'POST':
         city_name = request.form['city']
         category = request.form['category']
-        buildCategory(session)
+        buildCategory(session,category)
 
     return render_template("submit.html")
 

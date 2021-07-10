@@ -21,8 +21,9 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
 
 //Make ajax call to get geojson file
 function category_data(mymap){
-
-  $.getJSON("static/category.geojson", function(data){
+  category.clearLayers()
+  //To get around geojson cache I used a timestamp to make each request unique
+  $.getJSON("static/category.geojson",{_: new Date().getTime()} ,function(data){
     category_layer = L.geoJson(data,{
             onEachFeature: function (feature, layer) {
                 //layer.bindPopup('<p>' + feature.properties.name '</p>'));
