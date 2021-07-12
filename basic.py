@@ -79,6 +79,14 @@ class category_5(Base):
     shape_area = Column(Numeric)
     geom = Column(Geometry('POLYGON', 4326))
 
+#Create class for buildings table
+class buildings(Base):
+    __tablename__ = 'buildings'
+    gid = Column(Integer, primary_key=True)
+    shape_leng = Column(Numeric)
+    shape_area = Column(Numeric)
+    geom = Column(Geometry('POLYGON', 4326))
+
 
 #Create DB sessionmaker
 Session = sessionmaker(bind=engine)
@@ -116,7 +124,7 @@ def build_cityLimits(session):
     #Close file
     f.close()
 
-def buildCategory(session,category):
+def build_Category(session,category):
     #Ceate query of database
     print(category)
     if category == "category_1":
@@ -151,8 +159,7 @@ def buildCategory(session,category):
     #Close file
     f.close()
 
-def buildCity(session,city_name):
-    print(city_name)
+def build_City(session,city_name):
     #Ceate query of database to only get the city that was selected
     qry = session.query(city_limits,functions.ST_AsGeoJSON(city_limits.geom)).filter_by(name=f'{city_name}')
     #qry = session.query(city_limits,functions.ST_AsGeoJSON(city_limits.geom)).filter_by(name='Bayou La Batre')
@@ -180,6 +187,41 @@ def buildCity(session,city_name):
     #Close file
     f.close()
 
+def build_buildings(session,city_name):
+    #Create query to get all of the building footprints in the selected city
+    qry_coords = session.query(city_limits,functions.ST_AsText(city_limits.geom, srid=4326)).filter_by(name=f'{city_name}')
+
+    #Get the text values of the geometry
+    for row in qry_coords:
+        coord_text = row[1]
+
+    #Set the SRID for the spatial query
+    intersect = f"SRID=4326;{coord_text}"
+
+    #Create spatial query
+    qry = session.query(buildings,functions.ST_AsGeoJSON(buildings.geom)).filter(buildings.geom.ST_Intersects(intersect))
+
+    #Create geojson file
+    f = open(r"static/buildings.geojson", 'w')
+    #Write first line
+    f.write(f'{{"type":"FeatureCollection","features":[')
+
+    for row in qry:
+        #print(f'{{"type": "Feature","geometry":{row[1]},"properties": {{"name": {row[0].name}}}}}')
+        #Enforce right hand rule
+        corrected = rewind(row[1])
+        #Check to see if the row is the last element if so remove ending comma for geojson file
+        if row != qry[-1]:
+            #Write out rows to create geojson file with comma
+            f.write(f'{{"type": "Feature","geometry":{corrected}}},')
+        else:
+            #Write out list feature without ending comma
+            f.write(f'{{"type": "Feature","geometry":{corrected}}}')
+
+    #Write last line
+    f.write(f']}}')
+    #Close file
+    f.close()
 
 
 #Main web page
@@ -196,9 +238,10 @@ def submit():
         #Save form data into variables
         city_name = request.form['city']
         category = request.form['category']
-        #Call function to query data for category and city
-        buildCategory(session,category)
-        buildCity(session,city_name)
+        #Call function to query data for category, city and buildings
+        build_Category(session,category)
+        build_City(session,city_name)
+        build_buildings(session,city_name)
 
     return render_template("submit.html")
 
