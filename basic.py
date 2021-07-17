@@ -10,6 +10,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import select
 import psycopg2
 from geojson_rewind import rewind
+from sqlalchemy import text
 
 #Create flask python app
 app = Flask(__name__)
@@ -79,6 +80,15 @@ class category_5(Base):
     shape_area = Column(Numeric)
     geom = Column(Geometry('POLYGON', 4326))
 
+#Create class for buildings table
+class buildings(Base):
+    __tablename__ = 'buildings'
+    gid = Column(Integer, primary_key=True)
+    shape_leng = Column(Numeric)
+    shape_area = Column(Numeric)
+    city = Column(String)
+    geom = Column(Geometry('POLYGON', 4326))
+
 
 #Create DB sessionmaker
 Session = sessionmaker(bind=engine)
@@ -116,7 +126,7 @@ def build_cityLimits(session):
     #Close file
     f.close()
 
-def buildCategory(session,category):
+def build_Category(session,category):
     #Ceate query of database
     print(category)
     if category == "category_1":
@@ -151,8 +161,7 @@ def buildCategory(session,category):
     #Close file
     f.close()
 
-def buildCity(session,city_name):
-    print(city_name)
+def build_City(session,city_name):
     #Ceate query of database to only get the city that was selected
     qry = session.query(city_limits,functions.ST_AsGeoJSON(city_limits.geom)).filter_by(name=f'{city_name}')
     #qry = session.query(city_limits,functions.ST_AsGeoJSON(city_limits.geom)).filter_by(name='Bayou La Batre')
@@ -180,6 +189,33 @@ def buildCity(session,city_name):
     #Close file
     f.close()
 
+def build_buildings(session,city_name):
+    #Create query to get all of the building footprints in the selected city
+    #Create spatial query
+    conn = engine.connect()
+    #qry = text("""SELECT city, ST_AsGeoJSON(buildings.geom) AS "ST_AsGeoJSON_1" FROM buildings WHERE city='Bucks'""")
+    qry = text("""SELECT city, ST_AsGeoJSON(buildings.geom) AS "ST_AsGeoJSON_1" FROM buildings WHERE city= :c """)
+    result = conn.execute(qry, c=city_name)
+
+    #Create geojson file
+    f = open(r"static/buildings.geojson", 'w')
+    #Write first line
+    f.write(f'{{"type":"FeatureCollection","features":[')
+
+    for row in result:
+        #Enforce right hand rule
+        corrected = rewind(row[1])
+
+        #Write out rows to create geojson file with comma
+        f.write(f'{{"type": "Feature","geometry":{corrected},"properties": {{"name": "{row[0]}"}}}},')
+
+    #Write out last list feature without ending comma
+    f.write(f'{{"type": "Feature","geometry":{corrected},"properties": {{"name": "{row[0]}"}}}}')
+
+    #Write last line
+    f.write(f']}}')
+    #Close file
+    f.close()
 
 
 #Main web page
@@ -196,9 +232,10 @@ def submit():
         #Save form data into variables
         city_name = request.form['city']
         category = request.form['category']
-        #Call function to query data for category and city
-        buildCategory(session,category)
-        buildCity(session,city_name)
+        #Call function to query data for category, city and buildings
+        build_Category(session,category)
+        build_City(session,city_name)
+        build_buildings(session,city_name)
 
     return render_template("submit.html")
 
