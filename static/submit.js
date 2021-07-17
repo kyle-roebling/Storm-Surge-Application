@@ -5,6 +5,7 @@
 //Global variables
 var category = new L.LayerGroup();
 var city = new L.FeatureGroup();
+var building = new L.FeatureGroup();
 
 //Style variables
 var city_style ={
@@ -15,6 +16,10 @@ var city_style ={
 var category_style ={
   color: '#0079F2',
   stroke: false
+}
+
+var building_style ={
+  color: '#B5B5B5'
 }
 
 //Create leaflet map variable
@@ -64,7 +69,24 @@ function city_data(mymap){
       });
 };
 
+//Make ajax call to get geojson file for buildings
+function building_data(mymap){
+  //To get around geojson cache I used a timestamp to make each request unique
+  $.getJSON("static/buildings.geojson",{_: new Date().getTime()} ,function(data){
+    building_layer = L.geoJson(data,{
+            onEachFeature: function (feature, layer) {
+                //layer.bindPopup('<p>' + feature.properties.name '</p>'));
+                layer.setStyle(building_style);
+            },
+        })
+        building.addLayer(building_layer);
+        building.addTo(mymap);
+      });
+};
+
 //Add category geojson to map
 category_data(mymap)
 //Add city geojson to mapid
 city_data(mymap)
+//Add buildings to map
+building_data(mymap)

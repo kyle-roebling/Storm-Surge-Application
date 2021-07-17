@@ -10,6 +10,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import select
 import psycopg2
 from geojson_rewind import rewind
+from sqlalchemy import text
 
 #Create flask python app
 app = Flask(__name__)
@@ -85,6 +86,7 @@ class buildings(Base):
     gid = Column(Integer, primary_key=True)
     shape_leng = Column(Numeric)
     shape_area = Column(Numeric)
+    city = Column(String)
     geom = Column(Geometry('POLYGON', 4326))
 
 
@@ -189,34 +191,26 @@ def build_City(session,city_name):
 
 def build_buildings(session,city_name):
     #Create query to get all of the building footprints in the selected city
-    qry_coords = session.query(city_limits,functions.ST_AsText(city_limits.geom, srid=4326)).filter_by(name=f'{city_name}')
-
-    #Get the text values of the geometry
-    for row in qry_coords:
-        coord_text = row[1]
-
-    #Set the SRID for the spatial query
-    intersect = f"SRID=4326;{coord_text}"
-
     #Create spatial query
-    qry = session.query(buildings,functions.ST_AsGeoJSON(buildings.geom)).filter(buildings.geom.ST_Intersects(intersect))
+    conn = engine.connect()
+    #qry = text("""SELECT city, ST_AsGeoJSON(buildings.geom) AS "ST_AsGeoJSON_1" FROM buildings WHERE city='Bucks'""")
+    qry = text("""SELECT city, ST_AsGeoJSON(buildings.geom) AS "ST_AsGeoJSON_1" FROM buildings WHERE city= :c """)
+    result = conn.execute(qry, c=city_name)
 
     #Create geojson file
     f = open(r"static/buildings.geojson", 'w')
     #Write first line
     f.write(f'{{"type":"FeatureCollection","features":[')
 
-    for row in qry:
-        #print(f'{{"type": "Feature","geometry":{row[1]},"properties": {{"name": {row[0].name}}}}}')
+    for row in result:
         #Enforce right hand rule
         corrected = rewind(row[1])
-        #Check to see if the row is the last element if so remove ending comma for geojson file
-        if row != qry[-1]:
-            #Write out rows to create geojson file with comma
-            f.write(f'{{"type": "Feature","geometry":{corrected}}},')
-        else:
-            #Write out list feature without ending comma
-            f.write(f'{{"type": "Feature","geometry":{corrected}}}')
+
+        #Write out rows to create geojson file with comma
+        f.write(f'{{"type": "Feature","geometry":{corrected},"properties": {{"name": "{row[0]}"}}}},')
+
+    #Write out last list feature without ending comma
+    f.write(f'{{"type": "Feature","geometry":{corrected},"properties": {{"name": "{row[0]}"}}}}')
 
     #Write last line
     f.write(f']}}')
