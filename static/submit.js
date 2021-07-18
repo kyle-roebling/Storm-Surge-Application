@@ -6,6 +6,7 @@
 var category = new L.LayerGroup();
 var city = new L.FeatureGroup();
 var building = new L.FeatureGroup();
+var damage = new L.FeatureGroup();
 
 //Style variables
 var city_style ={
@@ -19,8 +20,16 @@ var category_style ={
 }
 
 var building_style ={
-  color: '#B5B5B5'
+  color: '#B5B5B5',
+  stroke: false
 }
+
+var damage_style ={
+  color: 'red',
+  stroke: false
+}
+
+
 
 //Create leaflet map variable
 var mymap = L.map('mapid').setView([30.695366, -88.039894], 9);
@@ -84,6 +93,23 @@ function building_data(mymap){
       });
 };
 
+//Make ajax call to get geojson file for buildings
+function damage_data(mymap){
+  //To get around geojson cache I used a timestamp to make each request unique
+  $.getJSON("static/damage.geojson",{_: new Date().getTime()} ,function(data){
+    damage_layer = L.geoJson(data,{
+            onEachFeature: function (feature, layer) {
+                //layer.bindPopup('<p>' + feature.properties.name '</p>'));
+                layer.setStyle(damage_style);
+            },
+        })
+        damage.addLayer(damage_layer);
+        damage.addTo(mymap);
+      });
+};
+
+//Add storm surge buildings to the map
+damage_data(mymap)
 //Add category geojson to map
 category_data(mymap)
 //Add city geojson to mapid

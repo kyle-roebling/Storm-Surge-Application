@@ -217,6 +217,59 @@ def build_buildings(session,city_name):
     #Close file
     f.close()
 
+def build_damage(session,category,city_name):
+    #Connect to database
+    conn = engine.connect()
+
+    #Get data text data for city
+    city_qry = text("""SELECT ST_AsEWKT(city_limits.geom) AS "ST_Text_1" FROM city_limits WHERE name= :c """)
+    city_result = conn.execute(city_qry, c=city_name)
+
+    #Put geom data into variable
+    for row in city_result:
+        city_coords = row
+
+    #Use if statement to get the correct category query
+    if category == "category_1":
+        qry = text("""SELECT ST_AsGeoJSON(buildings.geom) AS "ST_GeoJSON_1" FROM buildings,category_1 WHERE buildings.city =:c AND ST_Within(buildings.geom,category_1.geom)""")
+    elif category == "category_2":
+        qry = text("""SELECT ST_AsGeoJSON(buildings.geom) AS "ST_GeoJSON_1" FROM buildings,category_2 WHERE buildings.city =:c AND ST_Within(buildings.geom,category_2.geom)""")
+    elif category == "category_3":
+        qry = text("""SELECT ST_AsGeoJSON(buildings.geom) AS "ST_GeoJSON_1" FROM buildings,category_3 WHERE buildings.city =:c AND ST_Within(buildings.geom,category_3.geom)""")
+    elif category == "category_4":
+        qry = text("""SELECT ST_AsGeoJSON(buildings.geom) AS "ST_GeoJSON_1" FROM buildings,category_4 WHERE buildings.city =:c AND ST_Within(buildings.geom,category_4.geom)""")
+    elif category == "category_5":
+        qry = text("""SELECT ST_AsGeoJSON(buildings.geom) AS "ST_GeoJSON_1" FROM buildings,category_5 WHERE buildings.city =:c AND ST_Within(buildings.geom,category_5.geom)""")
+
+
+    #Execute querey
+    result = conn.execute(qry,c=city_name)
+
+    #Create spatial query; get buildings that are intersect both city and category
+    #qry = text("""SELECT ST_AsGeoJSON(buildings.geom) AS "ST_GeoJSON_1" FROM buildings,category_1 WHERE buildings.city =:c AND ST_Within(buildings.geom,category_1.geom)""")
+    #result = conn.execute(qry,c=city_name)
+
+    #Put geom data into variable
+    for row in result:
+        #Create geojson file
+        f = open(r"static/damage.geojson", 'w')
+        #Write first line
+        f.write(f'{{"type":"FeatureCollection","features":[')
+
+        for row in result:
+            #Enforce right hand rule
+            corrected = rewind(row[0])
+
+            #Write out rows to create geojson file with comma
+            f.write(f'{{"type": "Feature","geometry":{corrected}}},')
+
+        #Write out last list feature without ending comma
+        f.write(f'{{"type": "Feature","geometry":{corrected}}}')
+
+        #Write last line
+        f.write(f']}}')
+        #Close file
+        f.close()
 
 #Main web page
 @app.route('/')
@@ -236,6 +289,7 @@ def submit():
         build_Category(session,category)
         build_City(session,city_name)
         build_buildings(session,city_name)
+        build_damage(session,category,city_name)
 
     return render_template("submit.html")
 
