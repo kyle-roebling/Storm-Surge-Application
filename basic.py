@@ -271,6 +271,101 @@ def build_damage(session,category,city_name):
         #Close file
         f.close()
 
+def build_counts(session,category,city_name):
+    #Create connection to database
+    conn = engine.connect()
+
+    #Create query to get total building count from selected city
+    building_qry = text("""SELECT count(gid) FROM buildings WHERE city =:c""")
+
+    #Create query to get storm surge impacted buildings from selected city
+    #Use if statement to get the correct category query
+    if category == "category_1":
+        damage_building_qry = text("""SELECT COUNT(buildings.gid) FROM buildings,category_1 WHERE buildings.city =:c AND ST_Within(buildings.geom,category_1.geom)""")
+    elif category == "category_2":
+        damage_building_qry  = text("""SELECT COUNT(buildings.gid) FROM buildings,category_2 WHERE buildings.city =:c AND ST_Within(buildings.geom,category_2.geom)""")
+    elif category == "category_3":
+        damage_building_qry  = text("""SELECT COUNT(buildings.gid)FROM buildings,category_3 WHERE buildings.city =:c AND ST_Within(buildings.geom,category_3.geom)""")
+    elif category == "category_4":
+        damage_building_qry  = text("""SELECT COUNT(buildings.gid) FROM buildings,category_4 WHERE buildings.city =:c AND ST_Within(buildings.geom,category_4.geom)""")
+    elif category == "category_5":
+        damage_building_qry  = text("""SELECT COUNT(buildings.gid) FROM buildings,category_5 WHERE buildings.city =:c AND ST_Within(buildings.geom,category_5.geom)""")
+
+    #Create query to get total population of selected city
+    population_qry = text("""SELECT city_limits.pop2012 FROM city_limits WHERE name =:c """)
+
+    #Create query to get total population impacted by storm surge
+    #Use if statement to get the correct category query
+    if category == "category_1":
+        damage_population_qry = text("""SELECT SUM(population.pop2010) FROM population,category_1 WHERE population.city =:c AND ST_Within(population.geom,category_1.geom)""")
+    elif category == "category_2":
+        damage_population_qry  = text("""SELECT SUM(population.pop2010) FROM population,category_2 WHERE population.city =:c AND ST_Within(population.geom,category_2.geom)""")
+    elif category == "category_3":
+        damage_population_qry  = text("""SELECT SUM(population.pop2010) FROM population,category_3 WHERE population.city =:c AND ST_Within(population.geom,category_3.geom)""")
+    elif category == "category_4":
+        damage_population_qry  = text("""SELECT SUM(population.pop2010) FROM population,category_4 WHERE population.city =:c AND ST_Within(population.geom,category_4.geom)""")
+    elif category == "category_5":
+        damage_population_qry  = text("""SELECT SUM(population.pop2010) FROM population,category_5 WHERE population.city =:c AND ST_Within(population.geom,category_5.geom)""")
+
+    #Create query to get total mileage of roads impacted by storm surge
+    #Use if statement to get the correct category query
+    if category == "category_1":
+        damage_roads_qry = text("""SELECT SUM(roads.miles) FROM roads,category_1 WHERE roads.city =:c AND ST_Within(roads.geom,category_1.geom)""")
+    elif category == "category_2":
+        damage_roads_qry  = text("""SELECT SUM(roads.miles) FROM roads,category_2 WHERE roads.city =:c AND ST_Within(roads.geom,category_2.geom)""")
+    elif category == "category_3":
+        damage_roads_qry  = text("""SELECT SUM(roads.miles) FROM roads,category_3 WHERE roads.city =:c AND ST_Within(roads.geom,category_3.geom)""")
+    elif category == "category_4":
+        damage_roads_qry  = text("""SELECT SUM(roads.miles) FROM roads,category_4 WHERE roads.city =:c AND ST_Within(roads.geom,category_4.geom)""")
+    elif category == "category_5":
+        damage_roads_qry  = text("""SELECT SUM(roads.miles) FROM roads,category_5 WHERE population.city =:c AND ST_Within(roads.geom,category_5.geom)""")
+
+    #Create query to get total miles of roads in selected city
+    roads_qry = text("""SELECT SUM(roads.miles) FROM roads WHERE city =:c """)
+
+    #Execute query
+    building_count = conn.execute(building_qry,c=city_name)
+    damage_building_count = conn.execute(damage_building_qry,c=city_name)
+    population_count = conn.execute(population_qry,c=city_name)
+    damage_population_count = conn.execute(damage_population_qry,c=city_name)
+    roads_count = conn.execute(roads_qry,c=city_name)
+    damage_roads_count = conn.execute(damage_roads_qry,c=city_name)
+
+    #Save counts to variables
+    for row in building_count:
+        building_total = row[0]
+
+    for row in damage_building_count:
+        damage_building_total = row[0]
+        if damage_building_total == None:
+            damage_building_total = 0
+        else:
+            damage_building_total = int(damage_building_total)
+
+    for row in population_count:
+        population_total = int(row[0])
+
+    for row in damage_population_count:
+        damage_population_total = row[0]
+        if damage_population_total == None:
+            damage_population_total = 0
+        else:
+            damage_population_total = int(damage_population_total)
+
+    for row in roads_count:
+        roads_total = int(row[0])
+        print(roads_total)
+
+    for row in damage_roads_count:
+        damage_roads_total = row[0]
+        if damage_roads_total == None:
+            damage_roads_total = 0
+        else:
+             damage_roads_total = int(damage_roads_total)
+        print(damage_roads_total)
+
+    return building_total,damage_building_total,population_total,damage_population_total,roads_total,damage_roads_total
+
 #Main web page
 @app.route('/')
 def index():
@@ -290,6 +385,7 @@ def submit():
         build_City(session,city_name)
         build_buildings(session,city_name)
         build_damage(session,category,city_name)
+        build_counts(session,category,city_name)
 
     return render_template("submit.html")
 
