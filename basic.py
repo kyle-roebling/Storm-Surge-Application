@@ -208,9 +208,9 @@ def build_buildings(session,city_name):
 
         #Write out rows to create geojson file with comma
         f.write(f'{{"type": "Feature","geometry":{corrected},"properties": {{"name": "{row[0]}"}}}},')
-
-    #Write out last list feature without ending comma
-    f.write(f'{{"type": "Feature","geometry":{corrected},"properties": {{"name": "{row[0]}"}}}}')
+    if 'corrected' in locals():
+        #Write out last list feature without ending comma
+        f.write(f'{{"type": "Feature","geometry":{corrected},"properties": {{"name": "{row[0]}"}}}}')
 
     #Write last line
     f.write(f']}}')
@@ -262,9 +262,9 @@ def build_damage(session,category,city_name):
 
             #Write out rows to create geojson file with comma
             f.write(f'{{"type": "Feature","geometry":{corrected}}},')
-
-        #Write out last list feature without ending comma
-        f.write(f'{{"type": "Feature","geometry":{corrected}}}')
+        if 'corrected' in locals():
+            #Write out last list feature without ending comma
+            f.write(f'{{"type": "Feature","geometry":{corrected}}}')
 
         #Write last line
         f.write(f']}}')
@@ -318,7 +318,7 @@ def build_counts(session,category,city_name):
     elif category == "category_4":
         damage_roads_qry  = text("""SELECT SUM(roads.miles) FROM roads,category_4 WHERE roads.city =:c AND ST_Within(roads.geom,category_4.geom)""")
     elif category == "category_5":
-        damage_roads_qry  = text("""SELECT SUM(roads.miles) FROM roads,category_5 WHERE population.city =:c AND ST_Within(roads.geom,category_5.geom)""")
+        damage_roads_qry  = text("""SELECT SUM(roads.miles) FROM roads,category_5 WHERE roads.city =:c AND ST_Within(roads.geom,category_5.geom)""")
 
     #Create query to get total miles of roads in selected city
     roads_qry = text("""SELECT SUM(roads.miles) FROM roads WHERE city =:c """)
@@ -353,8 +353,12 @@ def build_counts(session,category,city_name):
             damage_population_total = int(damage_population_total)
 
     for row in roads_count:
-        roads_total = int(row[0])
-        print(roads_total)
+        roads_total = row[0]
+        if roads_total == None:
+            roads_total = 0
+        else:
+             droads_total = int(roads_total)
+
 
     for row in damage_roads_count:
         damage_roads_total = row[0]
@@ -362,7 +366,7 @@ def build_counts(session,category,city_name):
             damage_roads_total = 0
         else:
              damage_roads_total = int(damage_roads_total)
-        print(damage_roads_total)
+
 
     return building_total,damage_building_total,population_total,damage_population_total,roads_total,damage_roads_total
 
@@ -385,9 +389,10 @@ def submit():
         build_City(session,city_name)
         build_buildings(session,city_name)
         build_damage(session,category,city_name)
-        build_counts(session,category,city_name)
+        #building_total,damage_building_total,population_total,damage_population_total,roads_total,damage_roads_total
+        building_total,damage_building_total,population_total,damage_population_total,roads_total,damage_roads_total = build_counts(session,category,city_name)
 
-    return render_template("submit.html")
+    return render_template("submit.html", damage_pop = damage_population_total, damage_buildings = damage_building_total, damage_roads = damage_roads_total)
 
 
 if __name__ == '__main__':
