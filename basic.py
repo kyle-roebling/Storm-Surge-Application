@@ -310,18 +310,18 @@ def build_counts(session,category,city_name):
     #Create query to get total mileage of roads impacted by storm surge
     #Use if statement to get the correct category query
     if category == "category_1":
-        damage_roads_qry = text("""SELECT SUM(roads.miles) FROM roads,category_1 WHERE roads.city =:c AND ST_Within(roads.geom,category_1.geom)""")
+        damage_roads_qry = text("""SELECT COUNT(roads.gid) FROM roads,category_1 WHERE roads.city =:c AND ST_Within(roads.geom,category_1.geom)""")
     elif category == "category_2":
-        damage_roads_qry  = text("""SELECT SUM(roads.miles) FROM roads,category_2 WHERE roads.city =:c AND ST_Within(roads.geom,category_2.geom)""")
+        damage_roads_qry  = text("""SELECT COUNT(roads.gid) FROM roads,category_2 WHERE roads.city =:c AND ST_Within(roads.geom,category_2.geom)""")
     elif category == "category_3":
-        damage_roads_qry  = text("""SELECT SUM(roads.miles) FROM roads,category_3 WHERE roads.city =:c AND ST_Within(roads.geom,category_3.geom)""")
+        damage_roads_qry  = text("""SELECT COUNT(roads.gid) FROM roads,category_3 WHERE roads.city =:c AND ST_Within(roads.geom,category_3.geom)""")
     elif category == "category_4":
-        damage_roads_qry  = text("""SELECT SUM(roads.miles) FROM roads,category_4 WHERE roads.city =:c AND ST_Within(roads.geom,category_4.geom)""")
+        damage_roads_qry  = text("""SELECT COUNT(roads.gid) FROM roads,category_4 WHERE roads.city =:c AND ST_Within(roads.geom,category_4.geom)""")
     elif category == "category_5":
-        damage_roads_qry  = text("""SELECT SUM(roads.miles) FROM roads,category_5 WHERE roads.city =:c AND ST_Within(roads.geom,category_5.geom)""")
+        damage_roads_qry  = text("""SELECT COUNT(roads.gid) FROM roads,category_5 WHERE roads.city =:c AND ST_Within(roads.geom,category_5.geom)""")
 
     #Create query to get total miles of roads in selected city
-    roads_qry = text("""SELECT SUM(roads.miles) FROM roads WHERE city =:c """)
+    roads_qry = text("""SELECT COUNT(roads.gid) FROM roads WHERE city =:c """)
 
     #Execute query
     building_count = conn.execute(building_qry,c=city_name)
@@ -357,7 +357,7 @@ def build_counts(session,category,city_name):
         if roads_total == None:
             roads_total = 0
         else:
-             droads_total = int(roads_total)
+             roads_total = int(roads_total)
 
 
     for row in damage_roads_count:
@@ -392,7 +392,19 @@ def submit():
         #building_total,damage_building_total,population_total,damage_population_total,roads_total,damage_roads_total
         building_total,damage_building_total,population_total,damage_population_total,roads_total,damage_roads_total = build_counts(session,category,city_name)
 
-    return render_template("submit.html", damage_pop = damage_population_total, damage_buildings = damage_building_total, damage_roads = damage_roads_total)
+        #Return category name to send to submit html page
+        if category == "category_1":
+            cat = 'Category 1'
+        elif category == "category_2":
+            cat = 'Category 2'
+        elif category == "category_3":
+            cat = 'Category 3'
+        elif category == "category_4":
+            cat = 'Category 4'
+        elif category == "category_5":
+            cat = 'Category 5'
+
+    return render_template("submit.html", damage_pop = damage_population_total, damage_buildings = damage_building_total, damage_roads = damage_roads_total, pop = population_total , building = building_total, road = roads_total, city = city_name, cat = cat)
 
 
 if __name__ == '__main__':
