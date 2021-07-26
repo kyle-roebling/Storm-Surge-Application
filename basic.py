@@ -387,7 +387,7 @@ def submit():
         #Call function to query data for category, city and buildings
         build_Category(session,category)
         build_City(session,city_name)
-        build_buildings(session,city_name)
+        #build_buildings(session,city_name)
         build_damage(session,category,city_name)
         #building_total,damage_building_total,population_total,damage_population_total,roads_total,damage_roads_total
         building_total,damage_building_total,population_total,damage_population_total,roads_total,damage_roads_total = build_counts(session,category,city_name)

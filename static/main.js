@@ -5,6 +5,14 @@
 //Global variables
 var city_limits = new L.LayerGroup();
 
+//Style variables
+var city_style ={
+  color: '#FCB900',
+  weight: 2,
+  fillOpacity: 0.3,
+
+}
+
 //Create leaflet map variable
 var mymap = L.map('mapid').setView([30.695366, -88.039894], 9);
 mymap.invalidateSize();
@@ -13,7 +21,7 @@ mymap.invalidateSize();
 L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
     maxZoom: 18,
-    id: 'mapbox/light-v10',
+    id: 'mapbox/streets-v11',
     tileSize: 512,
     zoomOffset: -1,
     accessToken: 'pk.eyJ1Ijoia3JvZWJsaW5nIiwiYSI6ImNqeXczaGplMjB3YjgzYmxyZGU1OG90bXUifQ.ItIrq8YGHvZIilkcx-U8Ag'
@@ -26,6 +34,7 @@ function city_limits_data(mymap){
     city_limits_layer = L.geoJson(data,{
             onEachFeature: function (feature, layer) {
                 //layer.bindPopup('<p>' + feature.properties.name '</p>'));
+                layer.setStyle(city_style);
             },
         })
         city_limits.addLayer(city_limits_layer);
