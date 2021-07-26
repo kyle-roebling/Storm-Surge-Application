@@ -15,8 +15,9 @@ var city_style ={
 }
 
 var category_style ={
-  color: '#0079F2',
-  stroke: false
+  color: '#75BEFE',
+  stroke: false,
+  fillOpacity: 0.5
 }
 
 var building_style ={
@@ -26,7 +27,8 @@ var building_style ={
 
 var damage_style ={
   color: 'red',
-  stroke: false
+  stroke: false,
+  fillOpacity: 1
 }
 
 
@@ -39,7 +41,7 @@ mymap.invalidateSize();
 L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
     maxZoom: 18,
-    id: 'mapbox/light-v10',
+    id: 'mapbox/streets-v11',
     tileSize: 512,
     zoomOffset: -1,
     accessToken: 'pk.eyJ1Ijoia3JvZWJsaW5nIiwiYSI6ImNqeXczaGplMjB3YjgzYmxyZGU1OG90bXUifQ.ItIrq8YGHvZIilkcx-U8Ag'
@@ -78,6 +80,7 @@ function city_data(mymap){
       });
 };
 
+
 //Make ajax call to get geojson file for buildings
 function building_data(mymap){
   //To get around geojson cache I used a timestamp to make each request unique
@@ -92,6 +95,7 @@ function building_data(mymap){
         building.addTo(mymap);
       });
 };
+
 
 //Make ajax call to get geojson file for buildings
 function damage_data(mymap){
@@ -108,11 +112,14 @@ function damage_data(mymap){
       });
 };
 
-//Add storm surge buildings to the map
-damage_data(mymap)
+
 //Add category geojson to map
 category_data(mymap)
 //Add city geojson to mapid
 city_data(mymap)
+
 //Add buildings to map
-building_data(mymap)
+//building_data(mymap)
+
+//Add storm surge buildings to the map
+damage_data(mymap)
