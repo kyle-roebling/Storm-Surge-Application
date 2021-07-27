@@ -43,3 +43,7 @@ function city_limits_data(mymap){
 };
 
 city_limits_data(mymap)
+
+$(window).on('load', function() {
+       $('#disclaimer').modal('show');
+});
