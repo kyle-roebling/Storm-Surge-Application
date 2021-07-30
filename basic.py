@@ -406,6 +406,11 @@ def submit():
 
     return render_template("submit.html", damage_pop = damage_population_total, damage_buildings = damage_building_total, damage_roads = damage_roads_total, pop = population_total , building = building_total, road = roads_total, city = city_name, cat = cat)
 
+#Page with information about the application
+@app.route('/about', methods=['POST'])
+def about():
+    return render_template("about.html")
+
 
 if __name__ == '__main__':
     app.run(debug=True)
