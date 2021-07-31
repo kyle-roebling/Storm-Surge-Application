@@ -2,8 +2,89 @@
   <head>
     <meta charset="utf-8">
     <title>Storm Surge Application About</title>
+    <!--Load Boostrap 4 js and css -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
   </head>
   <body>
+    <!-- Create Boostrap 4 Nav Bar -->
+    <nav class="navbar navbar-expand-sm bg-primary navbar-dark">
+      <a class="navbar-brand" href="#">
+        <img src="../static/red-hurricane.png" alt="Logo" style="width:30px;color:red;">
+      </a>
+      <span class="navbar-text text-white">
+          <h5>Coastal Alabama Storm Surge Impact</h5>
+      </span>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <!-- Everything inside here collaspes -->
+      <div class="collapse navbar-collapse" id="collapsibleNavbar">
+          <button type="button" class="btn btn-light btn-sm ml-auto my-2 mx-4" onclick="window.open('', '_self', ''); window.close();">Close</button>
+      </div>
+    </nav>
+
+    <!-- Create About Text -->
+    </br>
+    <div class="container">
+      <h3 class ="text-dark">About</h3>
+      <p class="text-dark">
+        The Coastal Alabama Storm Surge Application is a capstone project built for my GIS Master’s at the University of Wisconsin-Madison. The application looks at the effects of estimated storm surge on the coastal communities of Mobile and Baldwin Counties in Alabama. The user can select a city and category level of hurricane to see how estimated storm surge could impact their area of interest. Once the user clicks the analysis button, data is pulled from a PostgreSQL database and
+        geographical analysis is ran using PostGIS. After the data is returned, a side dashboard will display statistics about the impact of storm surge including population, buildings, and roads impacted. On the map, the user will see the boundary of the city of interest along with the estimated storm surge and buildings that would be projected to be impacted.
+      </p>
+    </div></br>
+
+    <!-- Create Bio Text -->
+    <div class="container">
+      <h3 class="text-dark">Bio</h3>
+      <p class="text-dark">
+        Growing up along the Gulf Coast, tropical weather has always been an interest of mine.  I have been directly impacted by numerous storms including Danny, Ivan, Katrina, Dennis, and most notably experiencing the eyewall of Hurricane Opal. This led my desire to pursue a degree in Meteorology.  I graduated with honors from the University of South Alabama with a bachelor’s degree in meteorology, with a strong concentration in Geographic Information Systems (GIS). I will be graduating from master’s degree program in GIS Programming from the University of Wisconsin-Madison in August of 2021.  I currently reside in the small town of Wetumpka in central Alabama.  I am in my ninth year as a GIS professional, working in the electric utilities industry. Other interests of mine include: computer programming, severe weather forecasting, and weather data analysis.
+        </br> -Kyle Roebling
+      </p>
+    </div></br>
+
+    <!-- Create Resources Area -->
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6">
+          <h3 class="text-dark">Hurricane Resources</h3>
+          <a href="https://www.nhc.noaa.gov/" target="_blank">National Hurricane Center</a><br>
+          <a href="https://www.nhc.noaa.gov/aboutsshws.php" target="_blank">Saffir-Simpson Hurricane Scale</a><br>
+          <a href="https://www.nhc.noaa.gov/surge/" target="_blank">Storm Surge</a><br>
+        </div>
+        <div class="col-lg-6">
+            <h3 class="text-dark">FEMA Resources</h3>
+            <a href="https://www.ready.gov/hurricanes" target="_blank">FEMA Hurricane Ready</a><br>
+            <a href="https://www.mcema.net/" target="_blank">Mobile County EMA</a><br>
+            <a href="https://baldwincountyal.gov/departments/emergency-management-agency" target="_blank">Baldwin County EMA</a><br>
+        </div>
+      </div>
+    </div></br>
+
+    <!-- Create Data Resources Area -->
+    <div class="container">
+
+      <h3 class="text-dark">Data Sources</h3>
+      <a href="https://www.nhc.noaa.gov/nationalsurge/" target="_blank">Storm Surge Data</a><br>
+      <a href="https://github.com/Microsoft/USBuildingFootprints" target="_blank">Microsoft Building Footprints</a><br>
+      <a href="https://catalog.data.gov/dataset/tiger-line-shapefile-2018-state-alabama-current-county-subdivision-state-based" target="_blank">Alabama Road Data</a><br>
+      <a href="https://data-algeohub.opendata.arcgis.com/datasets/al-census-populated-places/explore?location=32.572691%2C-86.703613%2C7.00" target="_blank">Alabama Census Populated Areas</a><br>
+      <p>ArcGIS Online USA Census Block Points</p>
+      <div>
+    </div>
+
+
+
+
+
+    <!-- Include jQuery.js -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
   </body>
 </html>
