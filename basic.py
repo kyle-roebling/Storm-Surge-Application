@@ -15,10 +15,20 @@ from sqlalchemy import text
 #Create flask python app
 app = Flask(__name__)
 
-#Create database create create_engine
-password = "kmr504rmz36"
-engine = create_engine('postgresql://postgres:kmr504rmz36@localhost/StormSurge', echo=True)
-print(engine)
+#Create variable for development mode
+dev = False
+
+#If deveopement mode is true use local host database, else use production database
+if dev:
+    #Create database create create_engine
+    password = "kmr504rmz36"
+    engine = create_engine('postgresql://postgres:kmr504rmz36@localhost/StormSurge', echo=True)
+    print(engine)
+else:
+    #Create database create create_engine
+    engine = create_engine('postgresql://gismapgi:23IHij9p2x@gismap22.gis-cdn.net/gismapgi_stormsurge', echo=True)
+    print(engine)
+
 
 #Create declarative_base for table
 Base = declarative_base()
@@ -222,12 +232,12 @@ def build_damage(session,category,city_name):
     conn = engine.connect()
 
     #Get data text data for city
-    city_qry = text("""SELECT ST_AsEWKT(city_limits.geom) AS "ST_Text_1" FROM city_limits WHERE name= :c """)
-    city_result = conn.execute(city_qry, c=city_name)
+    #city_qry = text("""SELECT ST_AsEWKT(city_limits.geom) AS "ST_Text_1" FROM city_limits WHERE name= :c """)
+    #city_result = conn.execute(city_qry, c=city_name)
 
     #Put geom data into variable
-    for row in city_result:
-        city_coords = row
+    #for row in city_result:
+        #city_coords = row
 
     #Use if statement to get the correct category query
     if category == "category_1":
@@ -276,7 +286,7 @@ def build_counts(session,category,city_name):
     conn = engine.connect()
 
     #Create query to get total building count from selected city
-    building_qry = text("""SELECT count(gid) FROM buildings WHERE city =:c""")
+    #building_qry = text("""SELECT count(gid) FROM buildings WHERE city =:c""")
 
     #Create query to get storm surge impacted buildings from selected city
     #Use if statement to get the correct category query
@@ -292,7 +302,7 @@ def build_counts(session,category,city_name):
         damage_building_qry  = text("""SELECT COUNT(buildings.gid) FROM buildings,category_5 WHERE buildings.city =:c AND ST_Within(buildings.geom,category_5.geom)""")
 
     #Create query to get total population of selected city
-    population_qry = text("""SELECT city_limits.pop2012 FROM city_limits WHERE name =:c """)
+    count_qry = text("""SELECT city_limits.pop2012,city_limits.buildings,city_limits.roads FROM city_limits WHERE name =:c """)
 
     #Create query to get total population impacted by storm surge
     #Use if statement to get the correct category query
@@ -310,30 +320,30 @@ def build_counts(session,category,city_name):
     #Create query to get total mileage of roads impacted by storm surge
     #Use if statement to get the correct category query
     if category == "category_1":
-        damage_roads_qry = text("""SELECT COUNT(roads.gid) FROM roads,category_1 WHERE roads.city =:c AND ST_Within(roads.geom,category_1.geom)""")
+        damage_roads_qry = text("""SELECT COUNT(roads2.gid) FROM roads2,category_1 WHERE roads2.city =:c AND ST_Within(roads2.geom,category_1.geom)""")
     elif category == "category_2":
-        damage_roads_qry  = text("""SELECT COUNT(roads.gid) FROM roads,category_2 WHERE roads.city =:c AND ST_Within(roads.geom,category_2.geom)""")
+        damage_roads_qry  = text("""SELECT COUNT(roads2.gid) FROM roads2,category_2 WHERE roads2.city =:c AND ST_Within(roads2.geom,category_2.geom)""")
     elif category == "category_3":
-        damage_roads_qry  = text("""SELECT COUNT(roads.gid) FROM roads,category_3 WHERE roads.city =:c AND ST_Within(roads.geom,category_3.geom)""")
+        damage_roads_qry  = text("""SELECT COUNT(roads2.gid) FROM roads2,category_3 WHERE roads2.city =:c AND ST_Within(roads2.geom,category_3.geom)""")
     elif category == "category_4":
-        damage_roads_qry  = text("""SELECT COUNT(roads.gid) FROM roads,category_4 WHERE roads.city =:c AND ST_Within(roads.geom,category_4.geom)""")
+        damage_roads_qry  = text("""SELECT COUNT(roads2.gid) FROM roads2,category_4 WHERE roads2.city =:c AND ST_Within(roads2.geom,category_4.geom)""")
     elif category == "category_5":
-        damage_roads_qry  = text("""SELECT COUNT(roads.gid) FROM roads,category_5 WHERE roads.city =:c AND ST_Within(roads.geom,category_5.geom)""")
+        damage_roads_qry  = text("""SELECT COUNT(roads2.gid) FROM roads2,category_5 WHERE roads2.city =:c AND ST_Within(roads2.geom,category_5.geom)""")
 
     #Create query to get total miles of roads in selected city
-    roads_qry = text("""SELECT COUNT(roads.gid) FROM roads WHERE city =:c """)
+    #roads_qry = text("""SELECT COUNT(roads2.gid) FROM roads2 WHERE city =:c """)
 
     #Execute query
-    building_count = conn.execute(building_qry,c=city_name)
+    counts = conn.execute(count_qry,c=city_name)
     damage_building_count = conn.execute(damage_building_qry,c=city_name)
-    population_count = conn.execute(population_qry,c=city_name)
+    #population_count = conn.execute(population_qry,c=city_name)
     damage_population_count = conn.execute(damage_population_qry,c=city_name)
-    roads_count = conn.execute(roads_qry,c=city_name)
+    #roads_count = conn.execute(roads_qry,c=city_name)
     damage_roads_count = conn.execute(damage_roads_qry,c=city_name)
 
     #Save counts to variables
-    for row in building_count:
-        building_total = row[0]
+    #for row in building_count:
+        #building_total = row[0]
 
     for row in damage_building_count:
         damage_building_total = row[0]
@@ -342,8 +352,8 @@ def build_counts(session,category,city_name):
         else:
             damage_building_total = int(damage_building_total)
 
-    for row in population_count:
-        population_total = int(row[0])
+    #for row in population_count:
+        #population_total = int(row[0])
 
     for row in damage_population_count:
         damage_population_total = row[0]
@@ -352,13 +362,29 @@ def build_counts(session,category,city_name):
         else:
             damage_population_total = int(damage_population_total)
 
-    for row in roads_count:
-        roads_total = row[0]
+    #for row in roads_count:
+        #roads_total = row[0]
+        #if roads_total == None:
+            #roads_total = 0
+        #else:
+             #roads_total = int(roads_total)
+
+    for row in counts:
+        population_total = row[0]
+        building_total = row[1]
+        roads_total = row[2]
         if roads_total == None:
             roads_total = 0
         else:
-             roads_total = int(roads_total)
-
+            roads_total = int(roads_total)
+        if population_total == None:
+            population_total = 0
+        else:
+            population_total = int(population_total)
+        if roads_total == None:
+            roads_total = 0
+        else:
+            roads_total = int(roads_total)
 
     for row in damage_roads_count:
         damage_roads_total = row[0]
@@ -367,13 +393,12 @@ def build_counts(session,category,city_name):
         else:
              damage_roads_total = int(damage_roads_total)
 
-
     return building_total,damage_building_total,population_total,damage_population_total,roads_total,damage_roads_total
 
 #Main web page
 @app.route('/')
 def index():
-    build_cityLimits(session)
+    #build_cityLimits(session)
 
     return render_template("index.html")
 
