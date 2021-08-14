@@ -138,33 +138,41 @@ def build_cityLimits(session):
 
 def build_Category(session,category):
     #Ceate query of database
+    conn = engine.connect()
+
     print(category)
     if category == "category_1":
-        qry = session.query(category_1,functions.ST_AsGeoJSON(category_1.geom))
+        #qry = session.query(category_1,functions.ST_AsGeoJSON(category_1.geom))
+        qry = text("""SELECT ST_AsGeoJSON(category_1.geom) AS "ST_GeoJSON_1" FROM category_1""")
     elif category == "category_2":
-        qry = session.query(category_2,functions.ST_AsGeoJSON(category_2.geom))
+        #qry = session.query(category_2,functions.ST_AsGeoJSON(category_2.geom))
+        qry = text("""SELECT ST_AsGeoJSON(category_2.geom) AS "ST_GeoJSON_1" FROM category_2""")
     elif category == "category_3":
-        qry = session.query(category_3,functions.ST_AsGeoJSON(category_3.geom))
+        #qry = session.query(category_3,functions.ST_AsGeoJSON(category_3.geom))
+        qry = text("""SELECT ST_AsGeoJSON(category_3.geom) AS "ST_GeoJSON_1" FROM category_3""")
     elif category == "category_4":
-        qry = session.query(category_4,functions.ST_AsGeoJSON(category_4.geom))
+        #qry = session.query(category_4,functions.ST_AsGeoJSON(category_4.geom))
+        qry = text("""SELECT ST_AsGeoJSON(category_4.geom) AS "ST_GeoJSON_1" FROM category_4""")
     elif category == "category_5":
-        qry = session.query(category_5,functions.ST_AsGeoJSON(category_5.geom))
+        #qry = session.query(category_5,functions.ST_AsGeoJSON(category_5.geom))
+        qry = text("""SELECT ST_AsGeoJSON(category_5.geom) AS "ST_GeoJSON_1" FROM category_5""")
 
+    result = conn.execute(qry)
 
     #Create geojson file
     f = open(r"static/category.geojson", 'w')
     #Write first line
     f.write(f'{{"type":"FeatureCollection","features":[')
-    for row in qry:
+    for row in result:
         #Enforce right hand rule
-        corrected = rewind(row[1])
+        corrected = rewind(row[0])
         #Check to see if the row is the last element if so remove ending comma for geojson file
-        if row != qry[-1]:
-            #Write out rows to create geojson file with comma
-            f.write(f'{{"type": "Feature","geometry":{corrected}}},')
-        else:
-            #Write out list feature without ending comma
-            f.write(f'{{"type": "Feature","geometry":{corrected}}}')
+
+        #Write out rows to create geojson file with comma
+        f.write(f'{{"type": "Feature","geometry":{corrected}}},')
+    if 'corrected' in locals():
+        #Write out last list feature without ending comma
+        f.write(f'{{"type": "Feature","geometry":{corrected}}}')
 
     #Write last line
     f.write(f']}}')
@@ -172,27 +180,31 @@ def build_Category(session,category):
     f.close()
 
 def build_City(session,city_name):
-    #Ceate query of database to only get the city that was selected
-    qry = session.query(city_limits,functions.ST_AsGeoJSON(city_limits.geom)).filter_by(name=f'{city_name}')
-    #qry = session.query(city_limits,functions.ST_AsGeoJSON(city_limits.geom)).filter_by(name='Bayou La Batre')
 
+    conn = engine.connect()
+    #Ceate query of database to only get the city that was selected
+    #qry = session.query(city_limits,functions.ST_AsGeoJSON(city_limits.geom)).filter_by(name=f'{city_name}')
+    qry = text("""SELECT name, ST_AsGeoJSON(city_limits.geom) AS "ST_AsGeoJSON_1" FROM city_limits WHERE name= :c """)
+    result = conn.execute(qry, c=city_name)
+    #qry = session.query(city_limits,functions.ST_AsGeoJSON(city_limits.geom)).filter_by(name='Bayou La Batre')
+    print(result)
     #Create geojson file
     f = open(r"static/city.geojson", 'w')
     #Write first line
     f.write(f'{{"type":"FeatureCollection","features":[')
 
-    for row in qry:
-        print(row[0].name)
+    for row in result:
+        print(row[0])
         #print(f'{{"type": "Feature","geometry":{row[1]},"properties": {{"name": {row[0].name}}}}}')
         #Enforce right hand rule
         corrected = rewind(row[1])
-        #Check to see if the row is the last element if so remove ending comma for geojson file
-        if row != qry[-1]:
-            #Write out rows to create geojson file with comma
-            f.write(f'{{"type": "Feature","geometry":{corrected},"properties": {{"name": "{row[0].name}"}}}},')
-        else:
-            #Write out list feature without ending comma
-            f.write(f'{{"type": "Feature","geometry":{corrected},"properties": {{"name": "{row[0].name}"}}}}')
+
+        #Write out rows to create geojson file with comma
+        f.write(f'{{"type": "Feature","geometry":{corrected},"properties": {{"name": "{row[0]}"}}}},')
+    if 'corrected' in locals():
+        #Write out last list feature without ending comma
+        f.write(f'{{"type": "Feature","geometry":{corrected},"properties": {{"name": "{row[0]}"}}}}')
+
 
     #Write last line
     f.write(f']}}')
